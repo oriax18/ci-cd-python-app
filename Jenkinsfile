@@ -1,23 +1,26 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:latest'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     stages {
-        stage('Build Docker Image') {
+        stage('Clone Repository') {
             steps {
-                dir('app') {
-                    sh 'docker build -t myapp .'
-                }
+                git 'https://github.com/oriax18/ci-cd-python-app.git'
             }
         }
 
-        stage('Run App Container') {
+        stage('Build Docker Image') {
             steps {
-                sh 'docker run -d -p 8000:3000 --name myapp myapp || true'
+                sh 'docker build -t myapp ./app'
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                sh '''
+                    docker stop myapp || true
+                    docker rm myapp || true
+                    docker run -d -p 8000:3000 --name myapp myapp
+                '''
             }
         }
     }
