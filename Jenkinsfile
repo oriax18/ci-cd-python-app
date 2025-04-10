@@ -14,14 +14,5 @@ pipeline {
             }
         }
 
-        stage('Run Docker Container') {
-            steps {
-                sh '''
-                    docker stop myapp || true
-                    docker rm myapp || true
-                    docker run -d -p 8000:3000 --name myapp myapp
-                '''
-            }
-        }
     }
 }
